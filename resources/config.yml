@@ -1,0 +1,47 @@
+server:
+  port: 8080
+
+service:
+  name: golang-api-hexagonal
+
+database:
+  addr: ${DATABASE_ADDR}
+  port: ${DATABASE_PORT}
+  db-name: ${DATABASE_NAME}
+  user: ${DATABASE_USER}
+  pass: ${DATABASE_PASS}
+  insecure: ${DATABASE_INSECURE}
+  pool: 6
+  timeout: 5
+
+kafka:
+  security-protocol: "plaintext"
+  servers: "localhost:9092"
+  user: ""
+  pass: ""
+  client-name: "golang-api-hexagonal"
+  producer:
+    product-topic-event: product.event
+  consumer-enabled: true
+  consumer:
+    group: "golang-api-hexagonal-group"
+    topics:
+      - product.event
+    max-records: 10
+
+redis:
+  localhost: true
+  url: "localhost:6379"
+  user: ""
+  pass: ""
+  db: 0
+  public-key-file: "resources/redis/your-cert.crt"
+  private-key-file: "resources/redis/your-key.key"
+  ca-cert-file: "resources/redis/your-pem.pem"
+  time-out-in-seconds: 1
+
+oauth:
+  secret: ${OAUTH_SECRET}
+
+policies:
+  path: "resources/api_policies.rego"

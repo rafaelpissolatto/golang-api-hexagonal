@@ -1,0 +1,552 @@
+openapi: 3.0.3
+info:
+  title: Swagger golang-api-hexagonal - OpenAPI 3.0
+  description: |-
+    This is a sample golang-api-hexagonal Server based on the OpenAPI 3.0 specification.  You can find out more about
+    Swagger at [https://swagger.io](https://swagger.io).
+    Some useful links:
+    - [The golang-api-hexagonal repository](https://github.com/CarinaPetravicius/golang-api-hexagonal)
+    - [The source API definition for the golang-api-hexagonal](https://github.com/CarinaPetravicius/golang-api-hexagonal/openapi.yaml)
+  termsOfService: http://swagger.io/terms/
+  contact:
+    email: cpetravicius@gmail.com
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+externalDocs:
+  description: Find out more about Swagger
+  url: http://swagger.io
+servers:
+  - url: http://localhost:8080/v1
+tags:
+  - name: product
+    description: Everything about your products
+    externalDocs:
+      description: Find out more
+      url: http://swagger.io
+  - name: item
+    description: Product items
+    externalDocs:
+      description: Find out more about our product items
+      url: http://swagger.io
+paths:
+  /v1/product:
+    post:
+      tags:
+        - product
+      summary: Add a new product to the store
+      description: Add a new product to the store
+      operationId: addProduct
+      parameters:
+        - name: Authorization
+          in: header
+          description: 'Bearer token'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Create a new product in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Not Authenticated
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
+        '500':
+          description: Internal Server Error
+  /v1/product/findByStatus:
+    get:
+      tags:
+        - product
+      summary: Finds Products by status
+      description: Find products by status
+      operationId: findProductsByStatus
+      parameters:
+        - name: Authorization
+          in: header
+          description: 'Bearer token'
+          required: true
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: Status values that need to be considered for filter
+          required: false
+          explode: true
+          schema:
+            type: string
+            default: available
+            enum:
+              - available
+              - pending
+              - inactive
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Not Authenticated
+        '500':
+          description: Internal Server Error
+  /v1/product/{productId}:
+    get:
+      tags:
+        - product
+      summary: Find product by ID
+      description: Returns a single product
+      operationId: getProductById
+      parameters:
+        - name: Authorization
+          in: header
+          description: 'Bearer token'
+          required: true
+          schema:
+            type: string
+        - name: productId
+          in: path
+          description: ID of product to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: Invalid ID supplied
+        '401':
+          description: Not Authenticated
+        '404':
+          description: Product not found
+        '500':
+          description: Internal Server Error
+    put:
+      tags:
+        - product
+      summary: Update an existing product
+      description: Update an existing product by Id
+      operationId: updateProduct
+      parameters:
+        - name: Authorization
+          in: header
+          description: 'Bearer token'
+          required: true
+          schema:
+            type: string
+        - name: productId
+          in: path
+          description: ID of product to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Update an existent product in the store
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+        required: true
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductResponse'
+        '400':
+          description: Invalid ID supplied
+        '401':
+          description: Not Authenticated
+        '403':
+          description: Forbidden
+        '404':
+          description: Product not found
+        '500':
+          description: Internal Server Error
+    delete:
+      tags:
+        - product
+      summary: Deletes a product
+      description: delete a product
+      operationId: deleteProduct
+      parameters:
+        - name: Authorization
+          in: header
+          description: 'Bearer token'
+          required: true
+          schema:
+            type: string
+        - name: productId
+          in: path
+          description: ID of product to return
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '400':
+          description: Invalid ID supplied
+        '401':
+          description: Not Authenticated
+        '403':
+          description: Forbidden
+        '404':
+          description: Product not found
+        '500':
+          description: Internal Server Error
+  /v1/product/item:
+    post:
+      tags:
+        - item
+      summary: Place an product item
+      description: Place a new product item
+      operationId: placeItem
+      parameters:
+        - name: Authorization
+          in: header
+          description: 'Bearer token'
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '201':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Not Authenticated
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+  /v1/product/item/{itemId}:
+    get:
+      tags:
+        - item
+      summary: Find product item by ID
+      description: For valid response try uuid
+      operationId: getProductItemById
+      parameters:
+        - name: Authorization
+          in: header
+          description: 'Bearer token'
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          description: ID of product item that needs to be fetched
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ItemResponse'
+        '400':
+          description: Invalid ID supplied
+        '401':
+          description: Not Authenticated
+        '404':
+          description: Product Item not found
+        '500':
+          description: Internal Server Error
+    put:
+      tags:
+        - item
+      summary: put product item by ID
+      description: For valid response try integer uuid
+      operationId: updateItem
+      parameters:
+        - name: Authorization
+          in: header
+          description: 'Bearer token'
+          required: true
+          schema:
+            type: string
+        - name: itemId
+          in: path
+          description: ID of the product item that needs to be deleted
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Item'
+      responses:
+        '400':
+          description: Invalid ID supplied
+        '401':
+          description: Not Authenticated
+        '403':
+          description: Forbidden
+        '404':
+          description: Product Item not found
+        '500':
+          description: Internal Server Error
+components:
+  schemas:
+    Item:
+      required:
+        - productId
+        - costValue
+        - salesValue
+        - sold
+      type: object
+      properties:
+        productId:
+          type: string
+          format: uuid
+          example: 9b367bdf-de54-410e-9410-33d6f2a7713e
+        costValue:
+          type: number
+          format: float64
+          example: 19.90
+        salesValue:
+          type: number
+          format: float64
+          example: 29.90
+        sold:
+          type: boolean
+          example: false
+    ItemResponse:
+      required:
+        - id
+        - productId
+        - costValue
+        - salesValue
+        - profit
+        - sold
+        - creationDate
+        - updateDate
+        - auditUser
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 8b367bdf-de54-410e-9410-33d6f2a7713c
+        productId:
+          type: string
+          format: uuid
+          example: 9b367bdf-de54-410e-9410-33d6f2a7713e
+        costValue:
+          type: number
+          format: float64
+          example: 19.90
+        salesValue:
+          type: number
+          format: float64
+          example: 29.90
+        profit:
+          type: number
+          format: float64
+          example: 10.00
+        sold:
+          type: boolean
+          example: false
+        creationDate:
+          type: string
+          format: date-time
+          example: 28/01/2023 11:00:00
+        updateDate:
+          type: string
+          format: date-time
+          example: 28/02/2023 09:00:00
+        auditUser:
+          type: string
+          example: admin
+    Product:
+      required:
+        - name
+        - unitType
+        - unit
+        - brand
+        - color
+        - style
+        - status
+      type: object
+      properties:
+        name:
+          type: string
+          example: t-shirt
+          minimum: 2
+          maximum: 256
+        description:
+          type: string
+          example: t-shirt
+          minLength: 2
+          maxLength: 256
+        unitType:
+          type: string
+          description: unit of measurement type
+          example: size
+          enum:
+            - unit
+            - kilos
+            - grams
+            - liters
+            - box
+            - size
+        unit:
+          type: string
+          example: M
+          minLength: 1
+          maxLength: 50
+        brand:
+          type: string
+          example: Nike
+          minLength: 1
+          maxLength: 50
+        color:
+          type: string
+          example: black
+          minLength: 1
+          maxLength: 50
+        style:
+          type: string
+          example: striped
+          minLength: 1
+          maxLength: 50
+        status:
+          type: string
+          description: product status in the store
+          example: available
+          enum:
+            - available
+            - pending
+            - inactive
+    ProductResponse:
+      required:
+        - name
+        - unitType
+        - unit
+        - brand
+        - color
+        - style
+        - status
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: sku(stock keeping unit)
+          example: 9b367bdf-de54-410e-9410-33d6f2a7713e
+        name:
+          type: string
+          example: t-shirt
+          minimum: 2
+          maximum: 256
+        description:
+          type: string
+          example: t-shirt
+          minLength: 2
+          maxLength: 256
+        unitType:
+          type: string
+          description: unit of measurement type
+          example: size
+          enum:
+            - unit
+            - kilos
+            - grams
+            - liters
+            - box
+            - size
+        unit:
+          type: string
+          example: M
+          minLength: 1
+          maxLength: 50
+        brand:
+          type: string
+          example: Nike
+          minLength: 1
+          maxLength: 50
+        color:
+          type: string
+          example: black
+          minLength: 1
+          maxLength: 50
+        style:
+          type: string
+          example: striped
+          minLength: 1
+          maxLength: 50
+        status:
+          type: string
+          description: product status in the store
+          example: available
+          enum:
+            - available
+            - pending
+            - inactive
+        creationDate:
+          type: string
+          format: date-time
+          example: 28/01/2023 11:00:00
+        updateDate:
+          type: string
+          format: date-time
+          example: 28/02/2023 09:00:00
+        auditUser:
+          type: string
+          example: admin
+    ApiResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+  requestBodies:
+    Product:
+      description: Product object that needs to be added to the store
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Product'
